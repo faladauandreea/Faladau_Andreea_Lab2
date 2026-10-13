@@ -1,0 +1,30 @@
+﻿
+@page
+@model Faladau_Andreea_Lab2.Pages.Publishers.DetailsModel
+
+@{
+    ViewData["Title"] = "Publisher Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Publisher</h4>
+    <hr />
+
+    <dl class="row">
+        <dt class="col-sm-2">
+            Publisher Name
+        </dt>
+
+        <dd class="col-sm-10">
+            @Model.Publisher.PublisherName
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-page="./Edit"
+       asp-route-id="@Model.Publisher.ID">Edit</a> |
+    <a asp-page="./Index">Back to List</a>
+</div>
