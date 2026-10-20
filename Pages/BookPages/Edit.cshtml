@@ -71,6 +71,40 @@
                       class="text-danger"></span>
             </div>
 
+            <!-- CERINTA 15: Categoriile cartii -->
+            <div class="form-group mt-3">
+                <label class="control-label">Categories</label>
+
+                <div class="table">
+                    <table>
+                        <tr>
+                            @{
+                                int cnt = 0;
+                            }
+
+                            @foreach (var cat in Model.AssignedCategoryDataList)
+                            {
+                                if (cnt > 0 && cnt % 3 == 0)
+                                {
+                                    @:</tr><tr>
+                                }
+
+                                <td>
+                                    <input type="checkbox"
+                                           name="selectedCategories"
+                                           value="@cat.CategoryID"
+                                           checked="@cat.Assigned" />
+
+                                    @cat.CategoryID @cat.Name
+                                </td>
+
+                                cnt++;
+                            }
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
             <div class="form-group mt-3">
                 <input type="submit"
                        value="Save"

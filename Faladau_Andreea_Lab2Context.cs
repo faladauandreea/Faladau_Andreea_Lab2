@@ -11,4 +11,9 @@ public class Faladau_Andreea_Lab2Context(
     public DbSet<Publisher> Publisher { get; set; } = default!;
 
     public DbSet<Authors> Authors { get; set; } = default!;
+
+    // Laborator 3
+    public DbSet<Category> Category { get; set; } = default!;
+
+    public DbSet<BookCategory> BookCategory { get; set; } = default!;
 }

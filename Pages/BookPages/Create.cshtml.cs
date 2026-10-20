@@ -1,63 +1,89 @@
 
 using Faladau_Andreea_Lab2.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 
-namespace Faladau_Andreea_Lab2.Pages.BookPages;
-
-public class CreateModel : PageModel
+namespace Faladau_Andreea_Lab2.Pages.BookPages
 {
-    private readonly Faladau_Andreea_Lab2Context _context;
-
-    public CreateModel(Faladau_Andreea_Lab2Context context)
+    public class CreateModel : BookCategoriesPageModel
     {
-        _context = context;
-    }
+        private readonly Faladau_Andreea_Lab2Context _context;
 
-    [BindProperty]
-    public Book Book { get; set; } = default!;
+        public CreateModel(Faladau_Andreea_Lab2Context context)
+        {
+            _context = context;
+        }
 
-    public IActionResult OnGet()
-    {
-        LoadDropdowns();
-        return Page();
-    }
+        [BindProperty]
+        public Book Book { get; set; } = new Book();
 
-    public async Task<IActionResult> OnPostAsync()
-    {
-        if (!ModelState.IsValid)
+        public IActionResult OnGet()
         {
             LoadDropdowns();
+
+            var book = new Book();
+            book.BookCategories = new List<BookCategory>();
+
+            PopulateAssignedCategoryData(_context, book);
+
             return Page();
         }
 
-        _context.Book.Add(Book);
-        await _context.SaveChangesAsync();
+        public async Task<IActionResult> OnPostAsync(
+            string[] selectedCategories)
+        {
+            var newBook = new Book();
+            newBook.BookCategories = new List<BookCategory>();
 
-        return RedirectToPage("./Index");
-    }
-
-    private void LoadDropdowns()
-    {
-        ViewData["PublisherID"] = new SelectList(
-            _context.Publisher,
-            "ID",
-            "PublisherName"
-        );
-
-        ViewData["AuthorsID"] = new SelectList(
-            _context.Authors
-                .AsEnumerable()
-                .Select(a => new
+            if (selectedCategories != null)
+            {
+                foreach (var cat in selectedCategories)
                 {
-                    a.ID,
-                    FullName = a.FirstName + " " + a.LastName
-                }),
-            "ID",
-            "FullName"
-        );
+                    var catToAdd = new BookCategory
+                    {
+                        CategoryID = int.Parse(cat)
+                    };
+
+                    newBook.BookCategories.Add(catToAdd);
+                }
+            }
+
+            Book.BookCategories = newBook.BookCategories;
+
+            if (!ModelState.IsValid)
+            {
+                LoadDropdowns();
+                PopulateAssignedCategoryData(_context, Book);
+                return Page();
+            }
+
+            _context.Book.Add(Book);
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage("./Index");
+        }
+
+        private void LoadDropdowns()
+        {
+            ViewData["PublisherID"] = new SelectList(
+                _context.Publisher,
+                "ID",
+                "PublisherName",
+                Book.PublisherID
+            );
+
+            ViewData["AuthorsID"] = new SelectList(
+                _context.Authors
+                    .AsEnumerable()
+                    .Select(a => new
+                    {
+                        a.ID,
+                        FullName = a.FirstName + " " + a.LastName
+                    }),
+                "ID",
+                "FullName",
+                Book.AuthorsID
+            );
+        }
     }
 }
-
