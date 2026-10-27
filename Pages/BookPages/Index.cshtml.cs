@@ -22,11 +22,30 @@ namespace Faladau_Andreea_Lab2.Pages.BookPages
 
         public int CategoryID { get; set; }
 
-        public async Task OnGetAsync(int? id, int? categoryID)
+        public string TitleSort { get; set; } = string.Empty;
+
+        public string AuthorSort { get; set; } = string.Empty;
+
+        
+        public string CurrentFilter { get; set; } = string.Empty;
+
+        public async Task OnGetAsync(
+            int? id, int? categoryID,
+            string? sortOrder, string? searchString)
         {
             BookD = new BookData();
 
-            // Includem autorii, editurile si categoriile
+            // Stabilim ordinea de sortare
+            TitleSort = string.IsNullOrEmpty(sortOrder)
+                ? "title_desc" : "";
+
+            AuthorSort = sortOrder == "author"
+                ? "author_desc" : "author";
+
+            // Retinem textul cautat
+            CurrentFilter = searchString ?? string.Empty;
+
+            
             BookD.Books = await _context.Book
                 .Include(b => b.Publisher)
                 .Include(b => b.Authors)
@@ -36,9 +55,17 @@ namespace Faladau_Andreea_Lab2.Pages.BookPages
                 .OrderBy(b => b.Title)
                 .ToListAsync();
 
-            // Pastram lista pentru codul existent din Index.cshtml
-            Book = BookD.Books.ToList();
+            
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                BookD.Books = BookD.Books.Where(b =>
+                    b.Title.Contains(searchString) ||
+                    (b.Authors != null &&
+                    (b.Authors.FirstName.Contains(searchString) ||
+                     b.Authors.LastName.Contains(searchString))));
+            }
 
+           
             if (id != null)
             {
                 BookID = id.Value;
@@ -58,6 +85,38 @@ namespace Faladau_Andreea_Lab2.Pages.BookPages
             {
                 CategoryID = categoryID.Value;
             }
+
+          
+            switch (sortOrder)
+            {
+                case "title_desc":
+                    BookD.Books = BookD.Books
+                        .OrderByDescending(b => b.Title);
+                    break;
+
+                case "author_desc":
+                    BookD.Books = BookD.Books
+                        .OrderByDescending(b =>
+                            b.Authors != null
+                                ? b.Authors.FullName : "");
+                    break;
+
+                case "author":
+                    BookD.Books = BookD.Books
+                        .OrderBy(b =>
+                            b.Authors != null
+                                ? b.Authors.FullName : "");
+                    break;
+
+                default:
+                    BookD.Books = BookD.Books
+                        .OrderBy(b => b.Title);
+                    break;
+            }
+
+            
+            Book = BookD.Books.ToList();
         }
     }
 }
+

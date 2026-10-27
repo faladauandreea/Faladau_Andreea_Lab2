@@ -1,5 +1,3 @@
-
-
 @page "/"
 @model Faladau_Andreea_Lab2.Pages.BookPages.IndexModel
 
@@ -13,27 +11,60 @@
     <a asp-page="./Create">Create New</a>
 </p>
 
+<!-- PASUL 13 - Formular pentru cautare -->
+<form asp-page="./Index" method="get">
+    <div class="form-actions no-color">
+        <p>
+            Find by Book Title / Author Name:
+
+            <input type="text"
+                   name="SearchString"
+                   value="@Model.CurrentFilter" />
+
+            <input type="submit"
+                   value="Search"
+                   class="btn btn-primary" /> |
+
+            <a asp-page="./Index">Back to full List</a>
+        </p>
+    </div>
+</form>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Book[0].Title)
+                <a asp-page="./Index"
+                   asp-route-sortOrder="@Model.TitleSort"
+                   asp-route-searchString="@Model.CurrentFilter">
+                    @Html.DisplayNameFor(model => model.Book[0].Title)
+                </a>
             </th>
+
             <th>
-                Author
+                <a asp-page="./Index"
+                   asp-route-sortOrder="@Model.AuthorSort"
+                   asp-route-searchString="@Model.CurrentFilter">
+                    Author
+                </a>
             </th>
+
             <th>
                 @Html.DisplayNameFor(model => model.Book[0].Price)
             </th>
+
             <th>
                 @Html.DisplayNameFor(model => model.Book[0].PublishingDate)
             </th>
+
             <th>
                 Publisher
             </th>
+
             <th>
                 Categories
             </th>
+
             <th></th>
         </tr>
     </thead>
@@ -56,7 +87,7 @@
                 <td>
                     @if (item.Authors != null)
                     {
-                        @($"{item.Authors.FirstName} {item.Authors.LastName}")
+                        @item.Authors.FullName
                     }
                 </td>
 
@@ -83,7 +114,8 @@
                             if (category.Category != null)
                             {
                                 <div>
-                                    @category.Category.ID @category.Category.CategoryName
+                                    @category.Category.ID
+                                    @category.Category.CategoryName
                                 </div>
                             }
                         }
@@ -91,11 +123,17 @@
                 </td>
 
                 <td>
-                    <a asp-page="./Edit" asp-route-id="@item.ID">Edit</a> |
-                    <a asp-page="./Details" asp-route-id="@item.ID">Details</a> |
-                    <a asp-page="./Delete" asp-route-id="@item.ID">Delete</a>
+                    <a asp-page="./Edit"
+                       asp-route-id="@item.ID">Edit</a> |
+
+                    <a asp-page="./Details"
+                       asp-route-id="@item.ID">Details</a> |
+
+                    <a asp-page="./Delete"
+                       asp-route-id="@item.ID">Delete</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
