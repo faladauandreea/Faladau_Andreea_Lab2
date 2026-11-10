@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Faladau_Andreea_Lab2.Models;
+using System.Text.RegularExpressions;
 
 namespace Faladau_Andreea_Lab2.Pages.MemberPages;
 
@@ -43,6 +44,19 @@ public class EditModel : PageModel
         ModelState.Remove("Member.FullName");
         ModelState.Remove("Member.Borrowings");
 
+        if (!string.IsNullOrWhiteSpace(Member.Phone))
+        {
+            string phonePattern =
+                @"^\(?([0-9]{4})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{3})$";
+
+            if (!Regex.IsMatch(Member.Phone, phonePattern))
+            {
+                ModelState.AddModelError(
+                    "Member.Phone",
+                    "Telefonul trebuie sa fie de forma '0722-123-123' sau '0722.123.123' sau '0722 123 123'");
+            }
+        }
+
         if (!ModelState.IsValid)
         {
             return Page();
@@ -59,7 +73,6 @@ public class EditModel : PageModel
         memberToUpdate.FirstName = Member.FirstName;
         memberToUpdate.LastName = Member.LastName;
         memberToUpdate.Adress = Member.Adress;
-        memberToUpdate.Email = Member.Email;
         memberToUpdate.Phone = Member.Phone;
 
         try

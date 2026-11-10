@@ -1,11 +1,13 @@
 
 using Faladau_Andreea_Lab2.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace Faladau_Andreea_Lab2.Pages.BookPages
 {
+    [Authorize(Roles = "Admin")]
     public class EditModel : BookCategoriesPageModel
     {
         private readonly Faladau_Andreea_Lab2Context _context;
@@ -25,7 +27,6 @@ namespace Faladau_Andreea_Lab2.Pages.BookPages
                 return NotFound();
             }
 
-            // Includem Publisher, Authors si categoriile cartii
             var book = await _context.Book
                 .Include(b => b.Publisher)
                 .Include(b => b.Authors)
@@ -41,7 +42,6 @@ namespace Faladau_Andreea_Lab2.Pages.BookPages
 
             Book = book;
 
-            // Pregatim categoriile pentru checkbox-uri
             PopulateAssignedCategoryData(_context, Book);
 
             LoadDropdowns();
@@ -57,7 +57,6 @@ namespace Faladau_Andreea_Lab2.Pages.BookPages
                 return NotFound();
             }
 
-            // Incarcam cartea impreuna cu categoriile existente
             var bookToUpdate = await _context.Book
                 .Include(b => b.Publisher)
                 .Include(b => b.BookCategories)
@@ -69,7 +68,6 @@ namespace Faladau_Andreea_Lab2.Pages.BookPages
                 return NotFound();
             }
 
-            // Actualizam datele cartii
             if (await TryUpdateModelAsync<Book>(
                 bookToUpdate,
                 "Book",
@@ -79,7 +77,6 @@ namespace Faladau_Andreea_Lab2.Pages.BookPages
                 b => b.PublisherID,
                 b => b.AuthorsID))
             {
-                // Actualizam categoriile bifate
                 UpdateBookCategories(
                     _context, selectedCategories, bookToUpdate);
 
@@ -88,7 +85,6 @@ namespace Faladau_Andreea_Lab2.Pages.BookPages
                 return RedirectToPage("./Index");
             }
 
-            // Daca validarea esueaza, reincarcam categoriile
             UpdateBookCategories(
                 _context, selectedCategories, bookToUpdate);
 

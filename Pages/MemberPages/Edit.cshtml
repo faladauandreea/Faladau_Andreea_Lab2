@@ -1,4 +1,3 @@
-
 @page
 @model Faladau_Andreea_Lab2.Pages.MemberPages.EditModel
 
@@ -38,7 +37,7 @@
 
             <div class="form-group">
                 <label asp-for="Member.Email" class="control-label"></label>
-                <input asp-for="Member.Email" class="form-control" />
+                <input asp-for="Member.Email" readonly class="form-control" />
                 <span asp-validation-for="Member.Email" class="text-danger"></span>
             </div>
 

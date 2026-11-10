@@ -8,7 +8,6 @@ using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -112,6 +111,21 @@ public class RegisterModel : PageModel
 
             if (result.Succeeded)
             {
+                var roleResult = await _userManager.AddToRoleAsync(
+                    user, "User");
+
+                if (!roleResult.Succeeded)
+                {
+                    foreach (var error in roleResult.Errors)
+                    {
+                        ModelState.AddModelError(
+                            string.Empty, error.Description);
+                    }
+
+                    await _userManager.DeleteAsync(user);
+                    return Page();
+                }
+
                 Member.Email = Input.Email;
 
                 _context.Member.Add(Member);
