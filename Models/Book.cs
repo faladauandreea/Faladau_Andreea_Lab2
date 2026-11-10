@@ -25,7 +25,7 @@ namespace Faladau_Andreea_Lab2.Models
 
         public Authors? Authors { get; set; }
 
-        
+        public ICollection<Borrowing>? Borrowings { get; set; }
         public ICollection<BookCategory>? BookCategories { get; set; }
     }
 }
